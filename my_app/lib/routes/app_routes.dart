@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../screens/login/login_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/main_screen.dart';
 import '../screens/product_list/product_list_screen.dart';
 import '../screens/product_detail/product_detail_screen.dart';
 import '../screens/cart/cart_screen.dart';
 import '../screens/checkout/checkout_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/register/register_email_screen.dart';
+import '../screens/register/register_otp_screen.dart';
+import '../screens/register/register_password_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -15,16 +19,22 @@ class AppRoutes {
   static const String cart = '/cart';
   static const String checkout = '/checkout';
   static const String profile = '/profile';
+  static const String registerEmail = '/register_email';
+  static const String registerOTP = '/register_otp';
+  static const String registerPassword = '/register_password';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       login: (context) => const LoginScreen(),
-      home: (context) => const HomeScreen(),
+      home: (context) => const MainScreen(),
       productList: (context) => const ProductListScreen(),
       productDetail: (context) => const ProductDetailScreen(),
       cart: (context) => const CartScreen(),
       checkout: (context) => const CheckoutScreen(),
       profile: (context) => const ProfileScreen(),
+      registerEmail: (context) => const RegisterEmailScreen(),
+      registerOTP: (context) => const RegisterOTPScreen(),
+      registerPassword: (context) => const RegisterPasswordScreen(),
     };
   }
 }

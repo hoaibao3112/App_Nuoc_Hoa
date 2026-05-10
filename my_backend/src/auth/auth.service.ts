@@ -76,7 +76,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload); // Dùng secret mặc định cấu hình ở module (15m)
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d',
+      expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d') as any,
     });
 
     // Lưu refreshToken vào DB

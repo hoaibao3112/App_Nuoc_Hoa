@@ -56,7 +56,7 @@ export class ProductsService {
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const product = this.productsRepository.create({
       ...createProductDto,
-      category: createProductDto.categoryId ? ({ id: createProductDto.categoryId } as Category) : null,
+      category: createProductDto.categoryId ? ({ id: createProductDto.categoryId } as Category) : undefined,
     });
     return this.productsRepository.save(product);
   }
@@ -65,7 +65,7 @@ export class ProductsService {
     const product = await this.findOne(id);
     
     if (updateProductDto.categoryId !== undefined) {
-      product.category = updateProductDto.categoryId ? ({ id: updateProductDto.categoryId } as Category) : null;
+      product.category = updateProductDto.categoryId ? ({ id: updateProductDto.categoryId } as Category) : undefined as any;
     }
     
     Object.assign(product, updateProductDto);

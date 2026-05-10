@@ -1,4 +1,5 @@
 import '../models/cart.dart';
+import '../models/product.dart';
 import '../utils/constants.dart';
 
 class CartService {

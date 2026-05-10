@@ -39,6 +39,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getProfile(@CurrentUser() user: any) {
     const userProfile = await this.usersService.findOne(user.sub);
+    if (!userProfile) return null;
     const { passwordHash: _, refreshToken: __, ...result } = userProfile;
     return result;
   }

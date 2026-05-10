@@ -26,7 +26,7 @@ export class User {
   role: UserRole;
 
   @Column({ nullable: true })
-  refreshToken: string; // Dùng cho refresh token JWT
+  refreshToken?: string; // Dùng cho refresh token JWT
 
   @CreateDateColumn()
   createdAt: Date;

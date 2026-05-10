@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./my_backend
+      dockerfile: Dockerfile
+    container_name: perfume_backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./my_backend/.env
+    restart: always
+
+# Nếu sau này bạn muốn chạy DB local, bạn có thể thêm service db ở đây:
+# db:
+#   image: postgres:15-alpine
+#   ...

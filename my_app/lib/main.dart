@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants.dart';
 
@@ -26,12 +27,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Perfume App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFDEAEB)),
+        textTheme: GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.home, // Tạm đổi initialRoute sang home để test giao diện
       routes: AppRoutes.getRoutes(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
+

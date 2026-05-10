@@ -6,13 +6,13 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
   price: number;
 
   @Column({ nullable: true })
