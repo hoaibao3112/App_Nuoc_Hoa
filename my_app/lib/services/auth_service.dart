@@ -9,6 +9,12 @@ class AuthService {
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
+        // Lưu token vào SecureStorage
+        final accessToken = response.data['accessToken'];
+        final refreshToken = response.data['refreshToken'];
+        if (accessToken != null) await ApiClient.secureStorage.write(key: 'accessToken', value: accessToken);
+        if (refreshToken != null) await ApiClient.secureStorage.write(key: 'refreshToken', value: refreshToken);
+
         return User.fromJson(response.data['user']);
       }
     } catch (e) {
@@ -40,6 +46,9 @@ class AuthService {
   Future<bool> logout() async {
     try {
       await ApiClient.dio.post('/auth/logout');
+      // Xoá token khỏi SecureStorage
+      await ApiClient.secureStorage.delete(key: 'accessToken');
+      await ApiClient.secureStorage.delete(key: 'refreshToken');
       return true;
     } catch (e) {
       print('Logout error: $e');
@@ -58,4 +67,24 @@ class AuthService {
     }
     return null;
   }
+
+  Future<bool> refreshToken() async {
+    try {
+      final oldRefresh = await ApiClient.secureStorage.read(key: 'refreshToken');
+      if (oldRefresh == null) return false;
+
+      final response = await ApiClient.dio.post('/auth/refresh', data: {'refreshToken': oldRefresh});
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final newAccessToken = response.data['accessToken'];
+        final newRefreshToken = response.data['refreshToken'];
+        if (newAccessToken != null) await ApiClient.secureStorage.write(key: 'accessToken', value: newAccessToken);
+        if (newRefreshToken != null) await ApiClient.secureStorage.write(key: 'refreshToken', value: newRefreshToken);
+        return true;
+      }
+    } catch (e) {
+      print('Refresh token error: $e');
+    }
+    return false;
+  }
 }
+

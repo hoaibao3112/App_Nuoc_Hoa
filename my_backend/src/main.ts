@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
@@ -10,14 +9,10 @@ async function bootstrap() {
   // Đặt prefix cho tất cả các route (VD: /api/auth, /api/products)
   app.setGlobalPrefix('api');
 
-  // Bật CORS cho phép Flutter gọi API kèm theo Cookie
+  // Bật CORS
   app.enableCors({
-    origin: true, // Trong thực tế nên để domain cụ thể hoặc list domain của frontend/app
-    credentials: true, // Cho phép đính kèm cookie
+    origin: true,
   });
-
-  // Sử dụng cookie-parser để đọc cookie từ request
-  app.use(cookieParser());
 
   // Kích hoạt class-validator toàn cục
   app.useGlobalPipes(
@@ -34,3 +29,4 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+

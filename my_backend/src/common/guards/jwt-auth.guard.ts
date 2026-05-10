@@ -9,17 +9,17 @@ export class JwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     
-    // Đọc accessToken từ cookie thay vì header
-    const token = request.cookies?.['accessToken'];
-    
-    if (!token) {
+    // Đọc accessToken từ header Authorization: Bearer <token>
+    const authHeader = request.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedException('Không tìm thấy token xác thực (chưa đăng nhập)');
     }
+
+    const token = authHeader.split(' ')[1];
     
     try {
       // Xác thực token
       const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
-      // Gán payload (chứa userId, email, role) vào request.user để dùng ở các controller
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException('Token không hợp lệ hoặc đã hết hạn');
@@ -28,3 +28,4 @@ export class JwtAuthGuard implements CanActivate {
     return true;
   }
 }
+

@@ -5,7 +5,7 @@ import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ApiClient.initCookieJar(); // Khởi tạo CookieJar trước khi app chạy
+  await ApiClient.init(); // Khởi tạo Interceptors
 
   runApp(
     MultiProvider(
