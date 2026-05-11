@@ -44,6 +44,7 @@ import { AddressesModule } from './addresses/addresses.module';
     ReviewsModule,
     WishlistsModule,
     VouchersModule,
+    AddressesModule,
   ],
 })
 export class AppModule {}

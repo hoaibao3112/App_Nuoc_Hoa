@@ -1,11 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../services/address_service.dart';
+import '../../models/address.dart';
 
-class AddressBookScreen extends StatelessWidget {
+class AddressBookScreen extends StatefulWidget {
   const AddressBookScreen({super.key});
 
+  @override
+  State<AddressBookScreen> createState() => _AddressBookScreenState();
+}
+
+class _AddressBookScreenState extends State<AddressBookScreen> {
   final Color primaryTextColor = const Color(0xFF6B4C52); // Dark brownish red
   final Color bgColor = const Color(0xFFF9F7F7);
+  final AddressService _addressService = AddressService();
+  List<Address> _addresses = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAddresses();
+  }
+
+  Future<void> _loadAddresses() async {
+    final addresses = await _addressService.getAddresses();
+    if (mounted) {
+      setState(() {
+        _addresses = addresses;
+        _isLoading = false;
+      });
+    }
+  }
+
+  IconData _getIconForTitle(String title) {
+    if (title.toLowerCase().contains('nhà')) return Icons.home_outlined;
+    if (title.toLowerCase().contains('văn phòng') || title.toLowerCase().contains('công ty')) return Icons.work_outline;
+    return Icons.location_on_outlined;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,33 +77,24 @@ class AddressBookScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             
-            _buildAddressCard(
-              icon: Icons.home_outlined,
-              title: 'Nhà riêng',
-              name: 'Minh Anh',
-              phone: '0901 234 567',
-              address: 'Số 45, Ngõ 12, Đường Xuân Thủy\nPhường Dịch Vọng Hậu, Quận Cầu Giấy\nThành phố Hà Nội',
-              isDefault: true,
-            ),
-            const SizedBox(height: 16),
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (_addresses.isEmpty)
+              const Center(child: Text('Chưa có địa chỉ nào được lưu.'))
+            else
+              ..._addresses.map((addr) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _buildAddressCard(
+                  icon: _getIconForTitle(addr.title),
+                  title: addr.title,
+                  name: addr.receiverName,
+                  phone: addr.phone,
+                  address: addr.address,
+                  isDefault: addr.isDefault,
+                ),
+              )),
             
-            _buildAddressCard(
-              icon: Icons.work_outline,
-              title: 'Văn phòng',
-              name: 'Linh Chi',
-              phone: '0388 777 999',
-              address: 'Tòa nhà Landmark 81, Tầng 24\n720A Điện Biên Phủ, Phường 22, Quận Bình Thạnh\nThành phố Hồ Chí Minh',
-            ),
             const SizedBox(height: 16),
-            
-            _buildAddressCard(
-              icon: Icons.location_on_outlined,
-              title: 'Ký túc xá',
-              name: 'Minh Anh',
-              phone: '0901 234 567',
-              address: 'Phòng 402, Nhà B3, Ký túc xá Đại học Quốc gia\nPhường Linh Trung, Thành phố Thủ Đức\nThành phố Hồ Chí Minh',
-            ),
-            const SizedBox(height: 32),
 
             // Delivery info banner
             Container(
