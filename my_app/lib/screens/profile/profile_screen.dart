@@ -36,49 +36,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Icon(Icons.menu, color: primaryTextColor),
-        title: Text(
-          'Scentie',
-          style: GoogleFonts.outfit(color: primaryTextColor, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.shopping_bag_outlined, color: primaryTextColor),
-            onPressed: () {},
-          )
-        ],
-        centerTitle: true,
-      ),
-      body: isLoading 
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
+    if (isLoading) return const Center(child: CircularProgressIndicator());
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // Profile Header
+          Container(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-            // Profile Header
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFDEAEB), Color(0xFFE5E5FF)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(30),
-              ),
               child: Row(
                 children: [
                   Stack(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 40,
-                        backgroundImage: NetworkImage('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'),
+                        backgroundImage: currentUser?.avatarUrl != null 
+                          ? NetworkImage(currentUser!.avatarUrl!) 
+                          : const NetworkImage('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'),
                       ),
+
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -171,19 +148,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 30),
             // Logout
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                final success = await _authService.logout();
+                if (success && mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                }
+              },
               icon: const Icon(Icons.logout, color: Colors.red),
               label: Text(
                 'Đăng xuất',
                 style: GoogleFonts.outfit(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 40),
-          ],
-        ),
+
+          const SizedBox(height: 120),
+        ],
       ),
     );
   }
+
 
   Widget _buildActionCard({required IconData icon, required String title, required String subtitle, required VoidCallback onTap, required Color iconBgColor}) {
     return InkWell(

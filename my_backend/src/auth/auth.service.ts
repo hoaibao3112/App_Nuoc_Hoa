@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { GoogleAuthService } from './google-auth.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private googleAuthService: GoogleAuthService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -68,6 +70,38 @@ export class AuthService {
     } catch (e) {
       throw new UnauthorizedException('Refresh token hết hạn hoặc không hợp lệ');
     }
+  }
+
+  async loginWithGoogle(idToken: string) {
+    // 1. Xác thực Google ID Token
+    const googleUser = await this.googleAuthService.verifyIdToken(idToken);
+
+    // 2. Tìm user theo googleId hoặc email
+    let user = await this.usersService.findByGoogleId(googleUser.googleId);
+
+    if (!user) {
+      // Thử tìm theo email (user đã đăng ký bằng email thông thường)
+      user = await this.usersService.findByEmail(googleUser.email);
+
+      if (user) {
+        // Liên kết tài khoản Google với tài khoản email hiện có
+        user = await this.usersService.updateProfile(user.id, {
+          googleId: googleUser.googleId,
+          avatarUrl: user.avatarUrl || googleUser.avatarUrl,
+        });
+      } else {
+        // Tạo tài khoản mới từ Google
+        user = await this.usersService.create({
+          email: googleUser.email,
+          fullName: googleUser.fullName,
+          avatarUrl: googleUser.avatarUrl,
+          googleId: googleUser.googleId,
+          passwordHash: '', // Không có mật khẩu
+        });
+      }
+    }
+
+    return this.generateTokens(user);
   }
 
   private async generateTokens(user: any) {

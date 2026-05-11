@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: AppRoutes.home, // Tạm đổi initialRoute sang home để test giao diện
+      initialRoute: AppRoutes.home, // Đổi về trang chủ theo ý người dùng
       routes: AppRoutes.getRoutes(),
       debugShowCheckedModeBanner: false,
     );

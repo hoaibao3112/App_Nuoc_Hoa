@@ -6,16 +6,22 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Cart')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.checkout);
-          },
-          child: const Text('Proceed to Checkout'),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text('Giỏ hàng của bạn', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 20),
+        Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.checkout);
+            },
+            child: const Text('Tiến hành thanh toán'),
+          ),
         ),
-      ),
+        const SizedBox(height: 120),
+      ],
     );
   }
+
 }

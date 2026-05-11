@@ -19,7 +19,15 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   imageUrl?: string;
+
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  discountPercent?: number;
 }
+
 
 export class UpdateProductDto {
   @IsString()
@@ -42,7 +50,15 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   imageUrl?: string;
+
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  discountPercent?: number;
 }
+
 
 export class FilterProductDto {
   @IsOptional()
@@ -56,4 +72,7 @@ export class FilterProductDto {
 
   @IsOptional()
   search?: string;
+
+  @IsOptional()
+  isFeatured?: string; // 'true' | 'false'
 }

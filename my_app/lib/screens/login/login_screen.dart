@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../routes/app_routes.dart';
+import '../../services/google_sign_in_service.dart';
+import '../../utils/constants.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +16,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final Color primaryTextColor = const Color(0xFF5D4037);
   final Color pastelPink = const Color(0xFFFDEAEB);
   final Color accentPink = const Color(0xFFE8C3C8);
+  final GoogleSignInService _googleSignInService = GoogleSignInService();
+  final _storage = const FlutterSecureStorage();
+  bool _isGoogleLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -147,9 +153,59 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 25),
                       // Google Login
-                      _buildSocialButton(
-                        'Đăng nhập bằng Google',
-                        'https://w7.pngwing.com/pngs/326/85/png-transparent-google-logo-google-text-trademark-logo-thumbnail.png',
+                      GestureDetector(
+                        onTap: _isGoogleLoading ? null : () async {
+                          setState(() => _isGoogleLoading = true);
+                          try {
+                            final result = await _googleSignInService.signInWithGoogle();
+                            if (result != null && mounted) {
+                              // Lưu token
+                              await _storage.write(key: 'accessToken', value: result['accessToken']);
+                              await _storage.write(key: 'refreshToken', value: result['refreshToken']);
+                              Navigator.pushReplacementNamed(context, AppRoutes.home);
+                            } else if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Đăng nhập Google thất bại. Vui lòng thử lại.')),
+                              );
+                            }
+                          } finally {
+                            if (mounted) setState(() => _isGoogleLoading = false);
+                          }
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 55,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey[200]!),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (_isGoogleLoading)
+                                const SizedBox(
+                                  width: 20, height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              else
+                                Image.network(
+                                  'https://w7.pngwing.com/pngs/326/85/png-transparent-google-logo-google-text-trademark-logo-thumbnail.png',
+                                  height: 20,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.g_mobiledata, size: 24),
+                                ),
+                              const SizedBox(width: 12),
+                              Text(
+                                _isGoogleLoading ? 'Đang đăng nhập...' : 'Đăng nhập bằng Google',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: primaryTextColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),

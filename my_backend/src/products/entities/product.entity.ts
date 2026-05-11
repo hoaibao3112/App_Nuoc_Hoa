@@ -22,7 +22,14 @@ export class Product {
   @ManyToOne(() => Category, (category) => category.products, { onDelete: 'SET NULL' })
   category: Category;
 
+  @Column({ default: false })
+  isFeatured: boolean;
+
+  @Column('decimal', { precision: 5, scale: 2, nullable: true })
+  discountPercent: number;
+
   @CreateDateColumn()
+
   createdAt: Date;
 
   @UpdateDateColumn()

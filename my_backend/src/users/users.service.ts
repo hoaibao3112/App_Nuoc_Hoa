@@ -18,6 +18,10 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { googleId } });
+  }
+
   async create(userData: Partial<User>): Promise<User> {
     const user = this.usersRepository.create(userData);
     return this.usersRepository.save(user);
@@ -26,4 +30,12 @@ export class UsersService {
   async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
     await this.usersRepository.update(id, { refreshToken: refreshToken ?? undefined });
   }
+
+  async updateProfile(id: string, updateData: Partial<User>): Promise<User> {
+    await this.usersRepository.update(id, updateData);
+    const updatedUser = await this.findOne(id);
+    if (!updatedUser) throw new Error('User not found');
+    return updatedUser;
+  }
 }
+

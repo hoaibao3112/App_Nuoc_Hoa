@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home/home_screen.dart';
-import 'product_list/product_list_screen.dart';
 import 'order_history/order_history_screen.dart';
 import 'profile/profile_screen.dart';
 import 'cart/cart_screen.dart';
+import '../utils/constants.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,10 +15,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  bool _isLoggedIn = false;
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const ProductListScreen(),
     const CartScreen(),
     const OrderHistoryScreen(),
     const ProfileScreen(),
@@ -28,21 +28,46 @@ class _MainScreenState extends State<MainScreen> {
   final Color activeBgColor = const Color(0xFFFFD1D1);
 
   @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final token = await ApiClient.secureStorage.read(key: 'accessToken');
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = token != null;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true, // Cho phép body tràn xuống dưới thanh điều hướng nếu cần
+      resizeToAvoidBottomInset: false, // Ngăn bàn phím đẩy thanh điều hướng lên (nếu muốn)
       body: Stack(
         children: [
-          _screens[_selectedIndex],
+          // Nội dung màn hình hiện tại
+          Positioned.fill(
+            child: _screens[_selectedIndex],
+          ),
+          // Thanh điều hướng nổi (Bottom Nav)
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: _buildBottomNavStack(),
+            child: SafeArea(
+              top: false,
+              child: _buildBottomNavStack(),
+            ),
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildBottomNavStack() {
     return Container(
@@ -71,10 +96,9 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(0, Icons.home_outlined, 'Trang chủ'),
-                _buildNavItem(1, Icons.grid_view_outlined, 'B.Sưu tập'),
-                _buildNavItem(2, Icons.shopping_cart_outlined, 'Giỏ hàng'),
-                _buildNavItem(3, Icons.shopping_bag_outlined, 'Đơn hàng'),
-                _buildNavItem(4, Icons.person_outline, 'Cá nhân'),
+                _buildNavItem(1, Icons.shopping_cart_outlined, 'Giỏ hàng'),
+                _buildNavItem(2, Icons.shopping_bag_outlined, 'Đơn hàng'),
+                _buildNavItem(3, _isLoggedIn ? Icons.person_outline : Icons.login_outlined, _isLoggedIn ? 'Cá nhân' : 'Đăng nhập'),
                 const SizedBox(width: 50), // Space for FAB
               ],
             ),
@@ -118,6 +142,10 @@ class _MainScreenState extends State<MainScreen> {
     bool isActive = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
+        if (index == 3 && !_isLoggedIn) {
+          Navigator.pushNamed(context, '/login');
+          return;
+        }
         setState(() {
           _selectedIndex = index;
         });

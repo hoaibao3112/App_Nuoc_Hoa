@@ -38,81 +38,77 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Icon(Icons.menu, color: primaryTextColor),
-        title: Text(
-          'Scentie',
-          style: GoogleFonts.outfit(color: primaryTextColor, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.shopping_bag_outlined, color: primaryTextColor),
-            onPressed: () {},
-          )
-        ],
-        centerTitle: true,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Lịch sử đơn hàng',
-                  style: GoogleFonts.outfit(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: primaryTextColor,
-                  ),
-                ),
-                Text(
-                  'Theo dõi các mùi hương thanh xuân bạn đã chọn',
-                  style: GoogleFonts.outfit(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            labelColor: primaryTextColor,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Colors.transparent,
-            dividerColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            tabs: [
-              _buildTab('Tất cả', true),
-              _buildTab('Chờ xác nhận', false),
-              _buildTab('Đang giao', false),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 50), // Header space
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Scentie',
+                style: GoogleFonts.outfit(color: primaryTextColor, fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              Icon(Icons.shopping_bag_outlined, color: primaryTextColor),
             ],
           ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: isLoading 
-              ? const Center(child: CircularProgressIndicator())
-              : TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildOrderList(allOrders),
-                    _buildOrderList(allOrders.where((o) => o.status == 'PENDING').toList()),
-                    _buildOrderList(allOrders.where((o) => o.status == 'SHIPPING').toList()),
-                  ],
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Lịch sử đơn hàng',
+                style: GoogleFonts.outfit(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: primaryTextColor,
                 ),
+              ),
+              Text(
+                'Theo dõi các mùi hương thanh xuân bạn đã chọn',
+                style: GoogleFonts.outfit(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          labelColor: primaryTextColor,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.transparent,
+          dividerColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          tabs: [
+            _buildTab('Tất cả', true),
+            _buildTab('Chờ xác nhận', false),
+            _buildTab('Đang giao', false),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: isLoading 
+            ? const Center(child: CircularProgressIndicator())
+            : TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildOrderList(allOrders),
+                  _buildOrderList(allOrders.where((o) => o.status == 'PENDING').toList()),
+                  _buildOrderList(allOrders.where((o) => o.status == 'SHIPPING').toList()),
+                ],
+              ),
+        ),
+      ],
     );
   }
+
 
   Widget _buildTab(String label, bool isActive) {
     return Tab(
@@ -144,7 +140,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 120),
+
       itemCount: orders.length,
       separatorBuilder: (context, index) => const SizedBox(height: 20),
       itemBuilder: (context, index) {

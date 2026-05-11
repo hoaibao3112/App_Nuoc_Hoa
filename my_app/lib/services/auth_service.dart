@@ -86,5 +86,18 @@ class AuthService {
     }
     return false;
   }
+
+  Future<User?> updateProfile(Map<String, dynamic> data) async {
+    try {
+      final response = await ApiClient.dio.patch('/users/me', data: data);
+      if (response.statusCode == 200) {
+        return User.fromJson(response.data);
+      }
+    } catch (e) {
+      print('Update profile error: $e');
+    }
+    return null;
+  }
 }
+
 

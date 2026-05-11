@@ -208,7 +208,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Có thể bạn sẽ thích', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryTextColor)),
-                      Text('Xem tất cả →', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/product_list');
+                        },
+                        child: Text('Xem tất cả →', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),

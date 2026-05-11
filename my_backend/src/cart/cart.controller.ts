@@ -32,4 +32,10 @@ export class CartController {
   remove(@CurrentUser() user: any, @Param('itemId') itemId: string) {
     return this.cartService.remove(user.sub, itemId);
   }
+
+  @Delete('clear')
+  clear(@CurrentUser() user: any) {
+    return this.cartService.clearCart(user.sub);
+  }
 }
+

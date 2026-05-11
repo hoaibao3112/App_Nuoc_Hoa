@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 export class UploadService {
   constructor(private configService: ConfigService) {}
 
-  async uploadFile(file: Express.Multer.File): Promise<string> {
+  async uploadFile(file: any): Promise<string> {
     // Boilerplate logic để upload ảnh lên Supabase Storage
     // 1. Lấy SUPABASE_URL và SUPABASE_KEY từ ConfigService
     // 2. Dùng Supabase Client để upload file

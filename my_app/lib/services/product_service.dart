@@ -2,11 +2,19 @@ import '../models/product.dart';
 import '../utils/constants.dart';
 
 class ProductService {
-  Future<List<Product>> getProducts({int page = 1, int limit = 10, String? search}) async {
+  Future<List<Product>> getProducts({
+    int page = 1,
+    int limit = 10,
+    String? search,
+    String? categoryId,
+  }) async {
     try {
       final Map<String, dynamic> queryParams = {'page': page, 'limit': limit};
       if (search != null && search.isNotEmpty) {
         queryParams['search'] = search;
+      }
+      if (categoryId != null && categoryId.isNotEmpty) {
+        queryParams['categoryId'] = categoryId;
       }
       
       final response = await ApiClient.dio.get('/products', queryParameters: queryParams);
@@ -19,6 +27,7 @@ class ProductService {
     }
     return [];
   }
+
 
   Future<Product?> getProductDetail(String id) async {
     try {

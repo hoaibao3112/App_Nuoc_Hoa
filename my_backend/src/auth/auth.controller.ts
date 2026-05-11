@@ -44,11 +44,18 @@ export class AuthController {
     return result;
   }
 
+  @Post('google')
+  async loginWithGoogle(@Body('idToken') idToken: string) {
+    if (!idToken) {
+      return { message: 'idToken là bắt buộc' };
+    }
+    const { user, accessToken, refreshToken } = await this.authService.loginWithGoogle(idToken);
+    return { user, accessToken, refreshToken };
+  }
+
   @Post('refresh')
   async refresh(@Body('refreshToken') oldRefreshToken: string) {
     const { user, accessToken, refreshToken } = await this.authService.refresh(oldRefreshToken);
-    
-    // Trả về token mới qua Body JSON
     return { accessToken, refreshToken };
   }
 }

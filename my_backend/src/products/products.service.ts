@@ -24,6 +24,10 @@ export class ProductsService {
     if (filter.search) {
       where.name = Like(`%${filter.search}%`);
     }
+    if (filter.isFeatured !== undefined) {
+      where.isFeatured = filter.isFeatured === 'true';
+    }
+
 
     const [items, total] = await this.productsRepository.findAndCount({
       where,

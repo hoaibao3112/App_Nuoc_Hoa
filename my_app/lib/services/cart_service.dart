@@ -33,4 +33,37 @@ class CartService {
       return false;
     }
   }
+  Future<bool> updateQuantity(String itemId, int quantity) async {
+    try {
+      final response = await ApiClient.dio.put(
+        '/cart/update/$itemId',
+        data: {'quantity': quantity},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Update cart quantity error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> removeItem(String itemId) async {
+    try {
+      final response = await ApiClient.dio.delete('/cart/remove/$itemId');
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Remove cart item error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> clearCart() async {
+    try {
+      final response = await ApiClient.dio.delete('/cart/clear');
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Clear cart error: $e');
+      return false;
+    }
+  }
 }
+

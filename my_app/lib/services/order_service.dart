@@ -36,4 +36,17 @@ class OrderService {
       return false;
     }
   }
+
+  Future<Order?> getOrderDetail(String orderId) async {
+    try {
+      final response = await ApiClient.dio.get('/orders/$orderId');
+      if (response.statusCode == 200) {
+        return Order.fromJson(response.data);
+      }
+    } catch (e) {
+      print('Get order detail error: $e');
+    }
+    return null;
+  }
 }
+

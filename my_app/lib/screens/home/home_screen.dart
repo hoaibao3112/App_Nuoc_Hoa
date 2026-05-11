@@ -52,29 +52,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              _buildTopBanner(),
-              const SizedBox(height: 30),
-              _buildFavoriteScents(),
-              const SizedBox(height: 30),
-              _buildFeaturedProducts(context),
-              const SizedBox(height: 30),
-              _buildStudentBanner(),
-              const SizedBox(height: 30),
-              _buildReviews(),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          _buildTopBanner(),
+          const SizedBox(height: 30),
+          _buildFavoriteScents(),
+          const SizedBox(height: 30),
+          _buildFeaturedProducts(context),
+          const SizedBox(height: 30),
+          _buildStudentBanner(),
+          const SizedBox(height: 30),
+          _buildReviews(),
+          const SizedBox(height: 100), // Khoảng trống để không bị thanh điều hướng che khuất
+        ],
       ),
     );
   }
+
 
   Widget _buildHeader() {
     return Padding(
@@ -286,11 +283,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: primaryTextColor,
                 ),
               ),
-              Text(
-                'Xem tất cả →',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/product_list');
+                },
+                child: Text(
+                  'Xem tất cả →',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
                 ),
               )
             ],
