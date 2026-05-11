@@ -10,6 +10,9 @@ import '../screens/profile/profile_screen.dart';
 import '../screens/register/register_email_screen.dart';
 import '../screens/register/register_otp_screen.dart';
 import '../screens/register/register_password_screen.dart';
+import '../screens/order_detail/order_detail_screen.dart';
+import '../screens/voucher/voucher_screen.dart';
+import '../screens/about/about_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -22,6 +25,9 @@ class AppRoutes {
   static const String registerEmail = '/register_email';
   static const String registerOTP = '/register_otp';
   static const String registerPassword = '/register_password';
+  static const String orderDetail = '/order_detail';
+  static const String voucher = '/voucher';
+  static const String about = '/about';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -35,6 +41,9 @@ class AppRoutes {
       registerEmail: (context) => const RegisterEmailScreen(),
       registerOTP: (context) => const RegisterOTPScreen(),
       registerPassword: (context) => const RegisterPasswordScreen(),
+      orderDetail: (context) => const OrderDetailScreen(),
+      voucher: (context) => const VoucherScreen(),
+      about: (context) => const AboutScreen(),
     };
   }
 }

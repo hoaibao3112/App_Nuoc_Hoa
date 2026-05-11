@@ -28,6 +28,15 @@ export class Product {
   @Column('decimal', { precision: 5, scale: 2, nullable: true })
   discountPercent: number;
 
+  @Column({ nullable: true })
+  brand: string;
+
+  @Column('int', { default: 0 })
+  stockQuantity: number;
+
+  @Column('int', { default: 0 })
+  soldQuantity: number;
+
   @CreateDateColumn()
 
   createdAt: Date;

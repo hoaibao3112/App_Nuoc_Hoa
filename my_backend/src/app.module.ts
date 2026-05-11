@@ -8,6 +8,9 @@ import { CategoriesModule } from './categories/categories.module';
 import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { UploadModule } from './upload/upload.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { WishlistsModule } from './wishlists/wishlists.module';
+import { VouchersModule } from './vouchers/vouchers.module';
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { UploadModule } from './upload/upload.module';
     CartModule,
     OrdersModule,
     UploadModule,
+    ReviewsModule,
+    WishlistsModule,
+    VouchersModule,
   ],
 })
 export class AppModule {}
