@@ -11,6 +11,7 @@ import { UploadModule } from './upload/upload.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { VouchersModule } from './vouchers/vouchers.module';
+import { AddressesModule } from './addresses/addresses.module';
 
 @Module({
   imports: [

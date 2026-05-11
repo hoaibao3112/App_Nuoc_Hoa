@@ -13,6 +13,8 @@ import '../screens/register/register_password_screen.dart';
 import '../screens/order_detail/order_detail_screen.dart';
 import '../screens/voucher/voucher_screen.dart';
 import '../screens/about/about_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
+import '../screens/profile/address_book_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -28,6 +30,8 @@ class AppRoutes {
   static const String orderDetail = '/order_detail';
   static const String voucher = '/voucher';
   static const String about = '/about';
+  static const String editProfile = '/edit_profile';
+  static const String addressBook = '/address_book';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -44,6 +48,8 @@ class AppRoutes {
       orderDetail: (context) => const OrderDetailScreen(),
       voucher: (context) => const VoucherScreen(),
       about: (context) => const AboutScreen(),
+      editProfile: (context) => const EditProfileScreen(),
+      addressBook: (context) => const AddressBookScreen(),
     };
   }
 }

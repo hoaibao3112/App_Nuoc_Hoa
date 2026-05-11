@@ -118,9 +118,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Column(
                 children: [
-                  _buildListTile(Icons.person_outlined, 'Thông tin tài khoản'),
+                  _buildListTile(Icons.person_outlined, 'Thông tin tài khoản', onTap: () {
+                    Navigator.pushNamed(context, '/edit_profile');
+                  }),
                   _buildDivider(),
-                  _buildListTile(Icons.location_on_outlined, 'Sổ địa chỉ'),
+                  _buildListTile(Icons.location_on_outlined, 'Sổ địa chỉ', onTap: () {
+                    Navigator.pushNamed(context, '/address_book');
+                  }),
                   _buildDivider(),
                   _buildListTile(Icons.confirmation_num_outlined, 'Voucher của tôi', badge: '2 MỚI'),
                   _buildDivider(),
@@ -201,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildListTile(IconData icon, String title, {String? badge}) {
+  Widget _buildListTile(IconData icon, String title, {String? badge, VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(icon, color: primaryTextColor, size: 22),
       title: Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w500, color: primaryTextColor)),
@@ -219,7 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-      onTap: () {},
+      onTap: onTap ?? () {},
     );
   }
 
