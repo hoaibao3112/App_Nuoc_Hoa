@@ -168,6 +168,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SnackBar(content: Text('Đăng nhập Google thất bại. Vui lòng thử lại.')),
                               );
                             }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Lỗi đăng nhập: $e')),
+                              );
+                            }
                           } finally {
                             if (mounted) setState(() => _isGoogleLoading = false);
                           }

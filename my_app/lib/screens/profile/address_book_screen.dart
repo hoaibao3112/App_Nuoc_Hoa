@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/address_service.dart';
 import '../../models/address.dart';
+import '../../routes/app_routes.dart';
 
 class AddressBookScreen extends StatefulWidget {
   const AddressBookScreen({super.key});
@@ -60,6 +61,15 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: Color(0xFF6B4C52)),
+            onPressed: () async {
+              final result = await Navigator.pushNamed(context, AppRoutes.addAddress);
+              if (result == true) {
+                _loadAddresses();
+              }
+            },
+          ),
           IconButton(
             icon: Icon(Icons.search, color: primaryTextColor),
             onPressed: () {},

@@ -15,6 +15,7 @@ import '../screens/voucher/voucher_screen.dart';
 import '../screens/about/about_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/address_book_screen.dart';
+import '../screens/profile/add_address_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -32,6 +33,7 @@ class AppRoutes {
   static const String about = '/about';
   static const String editProfile = '/edit_profile';
   static const String addressBook = '/address_book';
+  static const String addAddress = '/add_address';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -50,6 +52,7 @@ class AppRoutes {
       about: (context) => const AboutScreen(),
       editProfile: (context) => const EditProfileScreen(),
       addressBook: (context) => const AddressBookScreen(),
+      addAddress: (context) => const AddAddressScreen(),
     };
   }
 }

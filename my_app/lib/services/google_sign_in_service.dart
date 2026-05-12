@@ -40,8 +40,8 @@ class GoogleSignInService {
       }
       return null;
     } catch (e) {
-      print('Google Sign-In error: $e');
-      return null;
+      print('Google Sign-In Error Detail: $e');
+      rethrow;
     }
   }
 

@@ -56,7 +56,7 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+              
             // Title
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 32.0),
