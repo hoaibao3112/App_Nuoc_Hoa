@@ -1,8 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/constants.dart';
-import '../models/user.dart';
-import 'dart:convert';
 
 class GoogleSignInService {
   // Dùng Web Client ID cho serverClientId để có thể lấy được idToken gửi lên Backend

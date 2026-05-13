@@ -152,7 +152,7 @@ class _OrderCard extends StatelessWidget {
     final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
     String actionText = 'Xem chi tiết';
-    String? action2;
+    String action2;
     if (order.status == 'PENDING') {
       action2 = 'Hỗ trợ';
     } else if (order.status == 'COMPLETED') {
@@ -267,22 +267,21 @@ class _OrderCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 15),
-              if (action2 != null)
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onSupportTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B6B61),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    ),
-                    child: Text(
-                      action2,
-                      style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onSupportTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF8B6B61),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  ),
+                  child: Text(
+                    action2,
+                    style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
+              ),
             ],
           ),
         ],

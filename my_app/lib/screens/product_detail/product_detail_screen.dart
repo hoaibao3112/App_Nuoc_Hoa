@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/product.dart';
-import '../../services/cart_service.dart';
 import '../../services/product_service.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
@@ -14,7 +13,6 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final CartService _cartService = CartService();
   final ProductService _productService = ProductService();
   
   List<Product> relatedProducts = [];
