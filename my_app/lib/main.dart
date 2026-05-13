@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants.dart';
+import 'providers/cart_provider.dart';
 
 void main() async {
   try {
@@ -17,7 +18,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        Provider<String>(create: (_) => 'AppDiDong'),
+        ChangeNotifierProvider(create: (_) => CartProvider()..fetchCart()),
       ],
       child: const MyApp(),
     ),
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: AppRoutes.login, 
+      initialRoute: AppRoutes.home, 
       routes: AppRoutes.getRoutes(),
       debugShowCheckedModeBanner: false,
     );

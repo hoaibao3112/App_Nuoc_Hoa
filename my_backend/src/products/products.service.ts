@@ -62,7 +62,7 @@ export class ProductsService {
 
     const [items, total] = await this.productsRepository.findAndCount({
       where,
-      relations: ['category'],
+      relations: ['category', 'images'],
       skip,
       take: limit,
       order,
@@ -82,7 +82,7 @@ export class ProductsService {
   async findOne(id: string): Promise<Product> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category'],
+      relations: ['category', 'images'],
     });
     if (!product) throw new NotFoundException('Sản phẩm không tồn tại');
     return product;

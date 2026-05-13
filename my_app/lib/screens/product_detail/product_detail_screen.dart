@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../../models/product.dart';
 import '../../services/cart_service.dart';
 import '../../services/product_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
@@ -38,7 +40,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _addToCart(Product product) async {
-    final success = await _cartService.addToCart(product.id, 1);
+    final success = await context.read<CartProvider>().addToCart(product.id, 1);
     if (!mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã thêm vào giỏ hàng!')));

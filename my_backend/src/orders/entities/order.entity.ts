@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
+import { Voucher } from '../../vouchers/entities/voucher.entity';
+import { Address } from '../../addresses/entities/address.entity';
 
 @Entity('orders')
 export class Order {
@@ -21,6 +23,23 @@ export class Order {
 
   @Column('text', { nullable: true })
   shippingAddress: string;
+
+  @Column({ nullable: true })
+  addressId: string;
+
+  @ManyToOne(() => Address, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'addressId' })
+  address: Address;
+
+  @Column({ nullable: true })
+  voucherId: string;
+
+  @ManyToOne(() => Voucher, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'voucherId' })
+  voucher: Voucher;
+
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  discountAmount: number;
 
   @Column({ default: 'COD' })
   paymentMethod: string; // COD, VNPAY, MOMO

@@ -40,6 +40,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchCounts() async {
     try {
+      final accessToken = await ApiClient.secureStorage.read(key: 'accessToken');
+      if (accessToken == null) {
+        return;
+      }
       final orderResponse = await ApiClient.dio.get('/orders/summary/count');
       final voucherResponse = await ApiClient.dio.get('/vouchers/summary/count');
       if (mounted) {
@@ -70,9 +74,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: currentUser?.avatarUrl != null 
-                          ? NetworkImage(currentUser!.avatarUrl!) 
-                          : const NetworkImage('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'),
+                        backgroundColor: const Color(0xFFF0F0F0),
+                        backgroundImage: (currentUser?.avatarUrl != null && currentUser!.avatarUrl!.isNotEmpty)
+                          ? NetworkImage(currentUser!.avatarUrl!)
+                          : null,
+                        child: (currentUser?.avatarUrl == null || currentUser!.avatarUrl!.isEmpty)
+                          ? const Icon(Icons.person, size: 28, color: Colors.grey)
+                          : null,
                       ),
 
                       Positioned(

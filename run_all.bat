@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableDelayedExpansion
 title Khoi chay Do an Nuoc Hoa - MOBILE MODE
 echo -----------------------------------------
 echo [1/3] Dang khoi chay Backend (Docker)...
@@ -8,10 +9,20 @@ docker-compose up -d
 echo.
 echo [2/3] Dang khoi chay May ao Android...
 echo -----------------------------------------
+:: Xac dinh duong dan adb
+set "ADB_EXE=%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe"
+if not exist "%ADB_EXE%" (
+    echo [Loi] Khong tim thay adb: %ADB_EXE%
+    echo Hay kiem tra Android SDK va platform-tools.
+    pause
+    exit /b 1
+)
+
 :: Kiem tra xem co may ao nao dang chay san khong
 set "EMU_ID="
-for /f "tokens=2 delims=•" %%a in ('flutter devices ^| findstr /i "emulator-"') do (
-    set "EMU_ID=%%a"
+for /f "skip=1 tokens=1,2" %%a in ('"%ADB_EXE%" devices') do (
+    set "TEMP_ID=%%a"
+    if "%%b"=="device" if "!TEMP_ID:~0,9!"=="emulator-" set "EMU_ID=%%a"
 )
 
 if not "%EMU_ID%"=="" (
@@ -36,13 +47,20 @@ echo Dang bat may ao: %TARGET_EMU%
 start /b flutter emulators --launch %TARGET_EMU%
 
 echo Dang cho may ao ket noi...
+set /a TRY=0
 :wait_loop
 set "EMU_ID="
-for /f "tokens=2 delims=•" %%a in ('flutter devices ^| findstr /i "emulator-"') do (
-    set "EMU_ID=%%a"
+for /f "skip=1 tokens=1,2" %%a in ('"%ADB_EXE%" devices') do (
+    set "TEMP_ID=%%a"
+    if "%%b"=="device" if "!TEMP_ID:~0,9!"=="emulator-" set "EMU_ID=%%a"
 )
 
 if "%EMU_ID%"=="" (
+    set /a TRY+=1
+    if !TRY! GEQ 24 (
+        echo [Loi] Khong ket noi duoc emulator trong 2 phut. Hay mo Device Manager va thu lai.
+        exit /b 1
+    )
     timeout /t 5 /nobreak > nul 2>nul || ping -n 5 127.0.0.1 > nul
     goto wait_loop
 )

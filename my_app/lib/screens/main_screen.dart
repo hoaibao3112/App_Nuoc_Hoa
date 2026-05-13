@@ -5,6 +5,8 @@ import 'order_history/order_history_screen.dart';
 import 'profile/profile_screen.dart';
 import 'cart/cart_screen.dart';
 import '../utils/constants.dart';
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -160,11 +162,24 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: primaryTextColor,
-              size: 22,
-            ),
+            index == 1 
+              ? Consumer<CartProvider>(
+                  builder: (context, cart, child) => Badge(
+                    label: Text(cart.itemCount.toString()),
+                    isLabelVisible: cart.itemCount > 0,
+                    backgroundColor: const Color(0xFFD32F2F),
+                    child: Icon(
+                      icon,
+                      color: primaryTextColor,
+                      size: 22,
+                    ),
+                  ),
+                )
+              : Icon(
+                  icon,
+                  color: primaryTextColor,
+                  size: 22,
+                ),
             if (isActive)
               Text(
                 label,

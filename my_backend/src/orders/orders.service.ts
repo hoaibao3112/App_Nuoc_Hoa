@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CartService } from '../cart/cart.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { VouchersService } from '../vouchers/vouchers.service';
+import { AddressesService } from '../addresses/addresses.service';
 
 @Injectable()
 export class OrdersService {
@@ -13,46 +16,92 @@ export class OrdersService {
     @InjectRepository(OrderItem)
     private orderItemRepository: Repository<OrderItem>,
     private cartService: CartService,
+    private vouchersService: VouchersService,
+    private addressesService: AddressesService,
+    private dataSource: DataSource,
   ) {}
 
-  async createFromCart(userId: string): Promise<Order> {
+  async createFromCart(userId: string, createOrderDto: CreateOrderDto): Promise<Order> {
+    const { addressId, voucherCode, paymentMethod, shippingFee = 0 } = createOrderDto;
+
+    // 1. Kiểm tra địa chỉ
+    const address = await this.addressesService.findOne(addressId, userId);
+
+    // 2. Lấy giỏ hàng
     const cartItems = await this.cartService.findCartByUser(userId);
     if (cartItems.length === 0) {
       throw new BadRequestException('Giỏ hàng trống');
     }
 
-    let totalAmount = 0;
-    const orderItems: OrderItem[] = [];
+    // 3. Sử dụng Transaction để đảm bảo tính toàn vẹn
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    // Tính tổng tiền và tạo các item của order
-    for (const item of cartItems) {
-      const price = Number(item.product.price);
-      totalAmount += price * item.quantity;
-      
-      const orderItem = this.orderItemRepository.create({
-        product: item.product,
-        price: price,
-        quantity: item.quantity,
-      });
-      orderItems.push(orderItem);
+    try {
+      let subTotal = 0;
+      const items: OrderItem[] = [];
+
+      for (const item of cartItems) {
+        const price = Number(item.product.price);
+        subTotal += price * item.quantity;
+        
+        items.push(this.orderItemRepository.create({
+          product: item.product,
+          price: price,
+          quantity: item.quantity,
+        }));
+      }
+
+      // 4. Xử lý Voucher
+      let discountAmount = 0;
+      let voucherId: string | undefined = undefined;
+      if (voucherCode) {
+        const voucherRes = await this.vouchersService.validateVoucher({
+          code: voucherCode,
+          orderAmount: subTotal,
+        });
+        discountAmount = voucherRes.discountAmount;
+        voucherId = voucherRes.voucher.id;
+
+        // Cập nhật lượt dùng voucher
+        await queryRunner.manager.update('Voucher', voucherId, {
+          usedCount: voucherRes.voucher.usedCount + 1,
+        });
+      }
+
+      const totalAmount = subTotal + Number(shippingFee) - discountAmount;
+
+      // 5. Tạo Order
+      const orderData: any = {
+        user: { id: userId },
+        totalAmount: totalAmount < 0 ? 0 : totalAmount,
+        receiverName: address.receiverName,
+        receiverPhone: address.phone,
+        shippingAddress: address.address,
+        addressId: addressId,
+        paymentMethod,
+        shippingFee,
+        discountAmount,
+        voucherId,
+        status: 'PENDING',
+        items,
+      };
+
+      const order = this.orderRepository.create(orderData);
+      const savedOrder = await queryRunner.manager.save(order);
+
+      // 6. Xóa giỏ hàng sau khi tạo đơn
+      await this.cartService.clearCart(userId);
+
+      await queryRunner.commitTransaction();
+      return savedOrder as any;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    // Tạo đơn hàng
-    const order = this.orderRepository.create({
-      user: { id: userId },
-      totalAmount,
-      status: 'PENDING',
-      items: orderItems,
-    });
-
-    const savedOrder = await this.orderRepository.save(order);
-
-    // Xóa giỏ hàng sau khi tạo đơn
-    for (const item of cartItems) {
-      await this.cartService.remove(userId, item.id);
-    }
-
-    return savedOrder;
   }
 
   async findOrdersByUser(userId: string): Promise<Order[]> {

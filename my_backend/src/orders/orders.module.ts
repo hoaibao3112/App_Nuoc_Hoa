@@ -5,11 +5,15 @@ import { OrdersController } from './orders.controller';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CartModule } from '../cart/cart.module';
+import { VouchersModule } from '../vouchers/vouchers.module';
+import { AddressesModule } from '../addresses/addresses.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem]),
-    CartModule, // Import CartModule để OrdersService có thể truy xuất CartService
+    CartModule,
+    VouchersModule,
+    AddressesModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

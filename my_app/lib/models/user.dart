@@ -5,6 +5,8 @@ class User {
   final String? phone;
   final String? role;
   final String? avatarUrl;
+  final String? gender;
+  final String? birthDate;
   final int points;
   final String rank;
 
@@ -15,6 +17,8 @@ class User {
     this.phone,
     this.role,
     this.avatarUrl,
+    this.gender,
+    this.birthDate,
     this.points = 0,
     this.rank = 'Bạc',
   });
@@ -27,6 +31,8 @@ class User {
       phone: json['phone'],
       role: json['role'],
       avatarUrl: json['avatarUrl'],
+      gender: json['gender'],
+      birthDate: json['birthDate'],
       points: json['points'] ?? 0,
       rank: json['rank'] ?? 'Bạc',
     );

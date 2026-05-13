@@ -353,10 +353,6 @@ class AboutScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(16),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/images/community.jpg'), // placeholder
-                    fit: BoxFit.cover,
-                  ),
                 ),
                 child: const Center(child: Icon(Icons.groups, color: Colors.grey, size: 48)),
               ),

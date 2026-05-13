@@ -26,6 +26,34 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final token = await _storage.read(key: 'accessToken');
+    if (token != null && mounted) {
+      try {
+        final profile = await _authService.getProfile();
+        if (profile != null && mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        } else if (mounted) {
+          // Token hết hạn hoặc không hợp lệ, xoá đi để bắt đăng nhập lại
+          await _storage.delete(key: 'accessToken');
+          await _storage.delete(key: 'refreshToken');
+        }
+      } catch (e) {
+        // Lỗi kết nối hoặc token lỗi
+        if (mounted) {
+          await _storage.delete(key: 'accessToken');
+          await _storage.delete(key: 'refreshToken');
+        }
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();

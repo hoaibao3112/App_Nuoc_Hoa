@@ -1,4 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
 import '../utils/constants.dart';
 import '../models/user.dart';
 import 'dart:convert';
@@ -9,7 +10,8 @@ class GoogleSignInService {
       '384701986163-10tp1gf4rveo2ur6recc93ff6vvc1d04.apps.googleusercontent.com';
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: _serverClientId,
+    clientId: kIsWeb ? '67464016480-v980vjrndu8v0ia68e4vscf7e09v8m3d.apps.googleusercontent.com' : null,
+    serverClientId: kIsWeb ? null : _serverClientId,
     scopes: ['email', 'profile'],
   );
 
