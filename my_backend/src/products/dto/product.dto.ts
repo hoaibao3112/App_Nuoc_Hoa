@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+  IsBoolean,
+  IsInt,
+} from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -20,14 +27,23 @@ export class CreateProductDto {
   @IsOptional()
   imageUrl?: string;
 
+  @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
 
   @IsOptional()
   @IsNumber()
   discountPercent?: number;
-}
 
+  @IsString()
+  @IsOptional()
+  brand?: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  stockQuantity?: number;
+}
 
 export class UpdateProductDto {
   @IsString()
@@ -51,14 +67,23 @@ export class UpdateProductDto {
   @IsOptional()
   imageUrl?: string;
 
+  @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
 
   @IsOptional()
   @IsNumber()
   discountPercent?: number;
-}
 
+  @IsString()
+  @IsOptional()
+  brand?: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  stockQuantity?: number;
+}
 
 export class FilterProductDto {
   @IsOptional()
@@ -85,4 +110,5 @@ export class FilterProductDto {
   maxPrice?: number;
 
   @IsOptional()
-  sort?: 'price_asc' | 'price_desc' | 'newest' | 'popular';}
+  sort?: 'price_asc' | 'price_desc' | 'newest' | 'popular';
+}

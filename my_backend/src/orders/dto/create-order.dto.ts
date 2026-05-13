@@ -1,9 +1,24 @@
-import { IsNotEmpty, IsOptional, IsString, IsEnum, IsNumber, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsNumber,
+  IsUUID,
+} from 'class-validator';
 
 export enum PaymentMethod {
   COD = 'COD',
   VNPAY = 'VNPAY',
   MOMO = 'MOMO',
+}
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
 }
 
 export class CreateOrderDto {
@@ -22,4 +37,10 @@ export class CreateOrderDto {
   @IsNumber()
   @IsOptional()
   shippingFee?: number;
+}
+
+export class UpdateOrderStatusDto {
+  @IsEnum(OrderStatus, { message: 'Trạng thái đơn hàng không hợp lệ' })
+  @IsNotEmpty({ message: 'Trạng thái đơn hàng là bắt buộc' })
+  status: OrderStatus;
 }

@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CartService } from '../cart/cart.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { OrderStatus } from './dto/create-order.dto';
 import { VouchersService } from '../vouchers/vouchers.service';
 import { AddressesService } from '../addresses/addresses.service';
 
@@ -21,8 +26,16 @@ export class OrdersService {
     private dataSource: DataSource,
   ) {}
 
-  async createFromCart(userId: string, createOrderDto: CreateOrderDto): Promise<Order> {
-    const { addressId, voucherCode, paymentMethod, shippingFee = 0 } = createOrderDto;
+  async createFromCart(
+    userId: string,
+    createOrderDto: CreateOrderDto,
+  ): Promise<Order> {
+    const {
+      addressId,
+      voucherCode,
+      paymentMethod,
+      shippingFee = 0,
+    } = createOrderDto;
 
     // 1. Kiểm tra địa chỉ
     const address = await this.addressesService.findOne(addressId, userId);
@@ -45,12 +58,14 @@ export class OrdersService {
       for (const item of cartItems) {
         const price = Number(item.product.price);
         subTotal += price * item.quantity;
-        
-        items.push(this.orderItemRepository.create({
-          product: item.product,
-          price: price,
-          quantity: item.quantity,
-        }));
+
+        items.push(
+          this.orderItemRepository.create({
+            product: item.product,
+            price: price,
+            quantity: item.quantity,
+          }),
+        );
       }
 
       // 4. Xử lý Voucher
@@ -133,6 +148,24 @@ export class OrdersService {
     }
 
     order.status = 'CANCELLED';
+    return this.orderRepository.save(order);
+  }
+
+  async updateStatus(orderId: string, status: OrderStatus): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['items', 'items.product'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Đơn hàng không tồn tại');
+    }
+
+    order.status = status;
+    if (status === OrderStatus.DELIVERED) {
+      order.paymentStatus = 'PAID';
+    }
+
     return this.orderRepository.save(order);
   }
 }

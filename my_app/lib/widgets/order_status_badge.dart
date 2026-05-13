@@ -17,10 +17,12 @@ class OrderStatusBadge extends StatelessWidget {
         text = 'Chờ duyệt';
         break;
       case 'SHIPPING':
+      case 'SHIPPED':
         color = const Color(0xFF1E88E5); // Blue
         text = 'Đang giao';
         break;
       case 'COMPLETED':
+      case 'DELIVERED':
         color = const Color(0xFF43A047); // Green
         text = 'Đã giao';
         break;

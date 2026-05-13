@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../models/order.dart' as model;
@@ -86,12 +86,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text('Mã đơn hàng', style: TextStyle(fontSize: 12)),
+                child: const Text(
+                  'Mã đơn hàng',
+                  style: TextStyle(fontSize: 12),
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -103,7 +109,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ),
               Text(
-                'Đặt lúc ' + dateFormat.format(_order!.createdAt ?? DateTime.now()),
+                'Đặt lúc ' +
+                    dateFormat.format(_order!.createdAt ?? DateTime.now()),
                 style: GoogleFonts.outfit(color: Colors.grey, fontSize: 13),
               ),
               const SizedBox(height: 16),
@@ -134,11 +141,28 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       children: [
                         _buildStatusIcon(Icons.check, 'Đã đặt', true),
                         _buildLine(true),
-                        _buildStatusIcon(Icons.receipt_long, 'Đã xác nhận', _order!.status != 'PENDING' && _order!.status != 'CANCELLED'),
-                        _buildLine(_order!.status == 'SHIPPING' || _order!.status == 'COMPLETED'),
-                        _buildStatusIcon(Icons.local_shipping, 'Đang giao', _order!.status == 'SHIPPING' || _order!.status == 'COMPLETED'),
-                        _buildLine(_order!.status == 'COMPLETED'),
-                        _buildStatusIcon(Icons.check_circle_outline, 'Hoàn thành', _order!.status == 'COMPLETED'),
+                        _buildStatusIcon(
+                          Icons.receipt_long,
+                          'Đã xác nhận',
+                          _order!.status != 'PENDING' &&
+                              _order!.status != 'CANCELLED',
+                        ),
+                        _buildLine(
+                          _order!.status == 'SHIPPED' ||
+                              _order!.status == 'DELIVERED',
+                        ),
+                        _buildStatusIcon(
+                          Icons.local_shipping,
+                          'Đang giao',
+                          _order!.status == 'SHIPPED' ||
+                              _order!.status == 'DELIVERED',
+                        ),
+                        _buildLine(_order!.status == 'DELIVERED'),
+                        _buildStatusIcon(
+                          Icons.check_circle_outline,
+                          'Hoàn thành',
+                          _order!.status == 'DELIVERED',
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -150,12 +174,19 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.info_outline, color: primaryColor, size: 20),
+                          const Icon(
+                            Icons.info_outline,
+                            color: primaryColor,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               _getStatusInfo(_order!.status),
-                              style: const TextStyle(fontSize: 13, color: primaryColor),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: primaryColor,
+                              ),
                             ),
                           ),
                         ],
@@ -172,7 +203,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.inventory_2_outlined, color: primaryColor),
+                        const Icon(
+                          Icons.inventory_2_outlined,
+                          color: primaryColor,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Sản phẩm đã chọn',
@@ -185,17 +219,19 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    ..._order!.items.map((item) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildProductItem(
-                        item.product.name,
-                        '10ml',
-                        formatCurrency.format(item.product.price),
-                        item.product.imageUrl ?? '',
-                        ['Chiết', 'Chính hãng'],
-                        item.quantity,
+                    ..._order!.items.map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _buildProductItem(
+                          item.product.name,
+                          '10ml',
+                          formatCurrency.format(item.product.price),
+                          item.product.imageUrl ?? '',
+                          ['Chiết', 'Chính hãng'],
+                          item.quantity,
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
               ),
@@ -214,11 +250,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildSummaryRow('Tạm tính (' + _order!.items.length.toString() + ' sản phẩm)', formatCurrency.format(_order!.totalAmount)),
+                    _buildSummaryRow(
+                      'Tạm tính (' +
+                          _order!.items.length.toString() +
+                          ' sản phẩm)',
+                      formatCurrency.format(_order!.totalAmount),
+                    ),
                     const SizedBox(height: 8),
-                    _buildSummaryRow('Phí vận chuyển', formatCurrency.format(0)),
+                    _buildSummaryRow(
+                      'Phí vận chuyển',
+                      formatCurrency.format(0),
+                    ),
                     const SizedBox(height: 8),
-                    _buildSummaryRow('Voucher giảm giá', '-0đ', valueColor: Colors.green),
+                    _buildSummaryRow(
+                      'Voucher giảm giá',
+                      '-0đ',
+                      valueColor: Colors.green,
+                    ),
                     const Divider(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,8 +292,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: const [
-                          Text('Phương thức thanh toán', style: TextStyle(fontSize: 13, color: Colors.grey)),
-                          Text('Tiền mặt (COD)', style: TextStyle(fontWeight: FontWeight.bold, color: primaryColor)),
+                          Text(
+                            'Phương thức thanh toán',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          Text(
+                            'Tiền mặt (COD)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -262,11 +319,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   String _getStatusInfo(String status) {
     switch (status) {
-      case 'PENDING': return 'Đơn hàng đang chờ xác nhận từ cửa hàng.';
-      case 'SHIPPING': return 'Đơn hàng đang trên đường đến với bạn.';
-      case 'COMPLETED': return 'Đơn hàng đã được giao thành công.';
-      case 'CANCELLED': return 'Đơn hàng đã bị hủy.';
-      default: return 'Cảm ơn bạn đã mua sắm tại Scentie.';
+      case 'PENDING':
+        return 'Đơn hàng đang chờ xác nhận từ cửa hàng.';
+      case 'SHIPPED':
+        return 'Đơn hàng đang trên đường đến với bạn.';
+      case 'DELIVERED':
+        return 'Đơn hàng đã được giao thành công.';
+      case 'CANCELLED':
+        return 'Đơn hàng đã bị hủy.';
+      default:
+        return 'Cảm ơn bạn đã mua sắm tại Scentie.';
     }
   }
 
@@ -296,7 +358,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         CircleAvatar(
           radius: 16,
           backgroundColor: isActive ? primaryColor : Colors.grey.shade200,
-          child: Icon(icon, size: 16, color: isActive ? Colors.white : Colors.grey),
+          child: Icon(
+            icon,
+            size: 16,
+            color: isActive ? Colors.white : Colors.grey,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
@@ -320,7 +386,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildProductItem(String name, String capacity, String price, String imgUrl, List<String> tags, int quantity) {
+  Widget _buildProductItem(
+    String name,
+    String capacity,
+    String price,
+    String imgUrl,
+    List<String> tags,
+    int quantity,
+  ) {
     const Color primaryColor = Color(0xFF7A5E62);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,19 +418,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: primaryColor)),
-              Text('Dung tích: ' + capacity, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(
+                name,
+                style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              Text(
+                'Dung tích: ' + capacity,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
               const SizedBox(height: 4),
               Wrap(
                 spacing: 4,
-                children: tags.map((t) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFDEAEB),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(t, style: const TextStyle(fontSize: 10, color: primaryColor)),
-                )).toList(),
+                children: tags
+                    .map(
+                      (t) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDEAEB),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          t,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
@@ -365,8 +460,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(price, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: primaryColor)),
-            Text('x' + quantity.toString(), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            Text(
+              price,
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
+              ),
+            ),
+            Text(
+              'x' + quantity.toString(),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
           ],
         ),
       ],

@@ -2,9 +2,23 @@ import '../models/order.dart';
 import '../utils/constants.dart';
 
 class OrderService {
-  Future<Order?> createOrder() async {
+  Future<Order?> createOrder({
+    required String addressId,
+    required String paymentMethod,
+    String? voucherCode,
+    double shippingFee = 0,
+  }) async {
     try {
-      final response = await ApiClient.dio.post('/orders');
+      final response = await ApiClient.dio.post(
+        '/orders',
+        data: {
+          'addressId': addressId,
+          'paymentMethod': paymentMethod,
+          'shippingFee': shippingFee,
+          if (voucherCode != null && voucherCode.isNotEmpty)
+            'voucherCode': voucherCode,
+        },
+      );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Order.fromJson(response.data);
       }
@@ -49,4 +63,3 @@ class OrderService {
     return null;
   }
 }
-

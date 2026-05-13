@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../models/order.dart' as model;
@@ -12,7 +12,8 @@ class OrderHistoryScreen extends StatefulWidget {
   State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
 }
 
-class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTickerProviderStateMixin {
+class _OrderHistoryScreenState extends State<OrderHistoryScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final OrderService _orderService = OrderService();
   List<model.Order> _orders = [];
@@ -70,7 +71,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
           unselectedLabelColor: Colors.grey,
           indicatorColor: primaryColor,
           indicatorWeight: 3,
-          labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
+          labelStyle: GoogleFonts.outfit(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
           tabs: const [
             Tab(text: 'Tất cả'),
             Tab(text: 'Chờ duyệt'),
@@ -79,23 +83,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
           ],
         ),
       ),
-      body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
-        : TabBarView(
-            controller: _tabController,
-            children: [
-              _buildOrderList('ALL'),
-              _buildOrderList('PENDING'),
-              _buildOrderList('SHIPPING'),
-              _buildOrderList('COMPLETED'),
-            ],
-          ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _buildOrderList('ALL'),
+                _buildOrderList('PENDING'),
+                _buildOrderList('SHIPPED'),
+                _buildOrderList('DELIVERED'),
+              ],
+            ),
     );
   }
 
   Widget _buildOrderList(String status) {
-    final filteredOrders = status == 'ALL' 
-        ? _orders 
+    final filteredOrders = status == 'ALL'
+        ? _orders
         : _orders.where((o) => o.status == status).toList();
 
     if (filteredOrders.isEmpty) {
@@ -103,7 +107,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.withOpacity(0.5)),
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 80,
+              color: Colors.grey.withOpacity(0.5),
+            ),
             const SizedBox(height: 16),
             Text(
               'Chưa có đơn hàng nào',
@@ -123,9 +131,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
           order: order,
           onTap: () {
             Navigator.pushNamed(
-              context, 
-              '/order_detail', 
-              arguments: order.id
+              context,
+              '/order_detail',
+              arguments: order.id,
             ).then((_) => _fetchOrders());
           },
           onSupportTap: () => Navigator.pushNamed(context, '/support'),
@@ -155,7 +163,7 @@ class _OrderCard extends StatelessWidget {
     String action2;
     if (order.status == 'PENDING') {
       action2 = 'Hỗ trợ';
-    } else if (order.status == 'COMPLETED') {
+    } else if (order.status == 'DELIVERED') {
       action2 = 'Đánh giá';
     } else {
       action2 = 'Hỗ trợ';
@@ -207,7 +215,9 @@ class _OrderCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                  order.items.isNotEmpty ? (order.items.first.product.imageUrl ?? '') : '',
+                  order.items.isNotEmpty
+                      ? (order.items.first.product.imageUrl ?? '')
+                      : '',
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
@@ -215,7 +225,10 @@ class _OrderCard extends StatelessWidget {
                     width: 60,
                     height: 60,
                     color: Colors.grey.shade100,
-                    child: const Icon(Icons.inventory_2_outlined, color: Colors.grey),
+                    child: const Icon(
+                      Icons.inventory_2_outlined,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -225,10 +238,15 @@ class _OrderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      order.items.isNotEmpty ? order.items.first.product.name : 'Đơn hàng trống',
+                      order.items.isNotEmpty
+                          ? order.items.first.product.name
+                          : 'Đơn hàng trống',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: primaryColor),
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
                     ),
                     Text(
                       order.items.length.toString() + ' sản phẩm',
@@ -258,7 +276,9 @@ class _OrderCard extends StatelessWidget {
                     foregroundColor: primaryColor,
                     side: const BorderSide(color: Color(0xFFE5E5E5)),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
                   child: Text(
                     actionText,
@@ -274,11 +294,16 @@ class _OrderCard extends StatelessWidget {
                     backgroundColor: const Color(0xFF8B6B61),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
                   child: Text(
                     action2,
-                    style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
