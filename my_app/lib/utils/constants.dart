@@ -3,13 +3,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 
 class Constants {
-  // Đối với trình duyệt Web (Chrome), dùng localhost:3000
-  // Đối với Android Emulator, dùng 10.0.2.2:3000
+  // API URL can be provided at build time via --dart-define=API_URL
+  // Fallbacks:
+  // - If API_URL is set, use it.
+  // - For web default to production Render URL.
+  // - For mobile/emulator default to emulator host.
+  static const _envApiUrl = String.fromEnvironment('API_URL', defaultValue: '');
+
   static String get apiUrl {
-    if (kIsWeb) {
-      return 'http://localhost:3000/api';
-    }
-    return 'http://10.0.2.2:3000/api';
+    if (_envApiUrl.isNotEmpty) return _envApiUrl;
+    return 'https://app-nuoc-hoa.onrender.com/api';
   }
 }
 
