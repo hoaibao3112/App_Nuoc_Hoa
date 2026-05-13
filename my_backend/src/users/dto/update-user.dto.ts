@@ -4,6 +4,7 @@ import {
   IsPhoneNumber,
   IsDateString,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -24,5 +25,6 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsDateString()
-  birthDate?: string;
+  @Type(() => Date)
+  birthDate?: Date;
 }

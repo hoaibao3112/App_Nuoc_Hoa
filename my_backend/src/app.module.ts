@@ -26,7 +26,7 @@ import { AddressesModule } from './addresses/addresses.module';
         type: 'postgres',
         url: configService.get<string>('DATABASE_URL'),
         autoLoadEntities: true, // Tự động tìm và nạp các entity
-        synchronize: true, // Cảnh báo: Chỉ dùng cho dev, prod nên dùng migration
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
         ssl: {
           rejectUnauthorized: false, // Thường cần thiết khi kết nối Supabase
         },

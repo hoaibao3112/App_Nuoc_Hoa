@@ -10,8 +10,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // Bật CORS
+  const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
-    origin: true,
+    origin: corsOrigin ? corsOrigin.split(',').map((o) => o.trim()).filter(Boolean) : true,
+    credentials: true,
   });
 
   // Kích hoạt class-validator toàn cục

@@ -11,21 +11,25 @@ export class UsersController {
   // Lấy profile user hiện tại (thay cho getProfile bên auth nếu cần đồng nhất)
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getMe(@CurrentUser() user: any) {
-    return this.usersService.findOne(user.sub);
+  async getMe(@CurrentUser() user: any) {
+    const profile = await this.usersService.findOne(user.sub);
+    return this.usersService.toSafeUser(profile);
   }
 
   // Cập nhật profile user hiện tại
   @Patch('me')
   @UseGuards(JwtAuthGuard)
-  updateMe(@CurrentUser() user: any, @Body() dto: UpdateUserDto) {
-    return this.usersService.updateProfile(user.sub, dto);
+  async updateMe(@CurrentUser() user: any, @Body() dto: UpdateUserDto) {
+    const updated = await this.usersService.updateProfile(user.sub, dto);
+    return this.usersService.toSafeUser(updated);
   }
 
   // Lấy profile user qua ID (cho Admin hoặc public profile)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Param('id') id: string) {
+    const profile = await this.usersService.findOne(id);
+    return this.usersService.toSafeUser(profile);
   }
 }
 

@@ -37,5 +37,11 @@ export class UsersService {
     if (!updatedUser) throw new Error('User not found');
     return updatedUser;
   }
+
+  toSafeUser(user: User | null) {
+    if (!user) return null;
+    const { passwordHash, refreshToken, ...safeUser } = user;
+    return safeUser;
+  }
 }
 
