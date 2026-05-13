@@ -5,13 +5,18 @@ import 'routes/app_routes.dart';
 import 'utils/constants.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await ApiClient.init(); // Khởi tạo Interceptors
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    print('Checking API Initialization...');
+    await ApiClient.init(); 
+    print('API Initialized successfully.');
+  } catch (e) {
+    print('Initialization Error: $e');
+  }
 
   runApp(
     MultiProvider(
       providers: [
-        // TODO: Đăng ký các Provider quản lý trạng thái sau
         Provider<String>(create: (_) => 'AppDiDong'),
       ],
       child: const MyApp(),
@@ -28,11 +33,11 @@ class MyApp extends StatelessWidget {
       title: 'Perfume App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFDEAEB)),
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
+        textTheme: GoogleFonts.outfitTextTheme(Theme.of(context).textTheme),
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: AppRoutes.home, // Đổi về trang chủ theo ý người dùng
+      initialRoute: AppRoutes.login, 
       routes: AppRoutes.getRoutes(),
       debugShowCheckedModeBanner: false,
     );

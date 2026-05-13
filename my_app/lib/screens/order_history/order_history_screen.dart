@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../services/order_service.dart';
-import '../../models/order.dart' as model;
 import 'package:intl/intl.dart';
+import '../../models/order.dart' as model;
+import '../../services/order_service.dart';
+import '../../widgets/order_status_badge.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -14,192 +15,158 @@ class OrderHistoryScreen extends StatefulWidget {
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final OrderService _orderService = OrderService();
-  List<model.Order> allOrders = [];
-  bool isLoading = true;
-  final Color primaryTextColor = const Color(0xFF5D4037);
-  final Color accentPink = const Color(0xFFFDEAEB);
+  List<model.Order> _orders = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _fetchOrders();
   }
 
   Future<void> _fetchOrders() async {
-    final fetched = await _orderService.getOrders();
-    if (mounted) {
-      setState(() {
-        allOrders = fetched;
-        isLoading = false;
-      });
+    try {
+      final orders = await _orderService.getOrders();
+      if (mounted) {
+        setState(() {
+          _orders = orders;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 50), // Header space
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Scentie',
-                style: GoogleFonts.outfit(color: primaryTextColor, fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              Icon(Icons.shopping_bag_outlined, color: primaryTextColor),
-            ],
+    const Color primaryColor = Color(0xFF7A5E62);
+    const Color bgColor = Color(0xFFFAF7F7);
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Lịch sử đơn hàng',
+          style: GoogleFonts.outfit(
+            color: primaryColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Lịch sử đơn hàng',
-                style: GoogleFonts.outfit(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: primaryTextColor,
-                ),
-              ),
-              Text(
-                'Theo dõi các mùi hương thanh xuân bạn đã chọn',
-                style: GoogleFonts.outfit(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ),
-        TabBar(
+        centerTitle: true,
+        bottom: TabBar(
           controller: _tabController,
-          isScrollable: true,
-          labelColor: primaryTextColor,
+          labelColor: primaryColor,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.transparent,
-          dividerColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          tabs: [
-            _buildTab('Tất cả', true),
-            _buildTab('Chờ xác nhận', false),
-            _buildTab('Đang giao', false),
+          indicatorColor: primaryColor,
+          indicatorWeight: 3,
+          labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
+          tabs: const [
+            Tab(text: 'Tất cả'),
+            Tab(text: 'Chờ duyệt'),
+            Tab(text: 'Đang giao'),
+            Tab(text: 'Đã giao'),
           ],
         ),
-        const SizedBox(height: 10),
-        Expanded(
-          child: isLoading 
-            ? const Center(child: CircularProgressIndicator())
-            : TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildOrderList(allOrders),
-                  _buildOrderList(allOrders.where((o) => o.status == 'PENDING').toList()),
-                  _buildOrderList(allOrders.where((o) => o.status == 'SHIPPING').toList()),
-                ],
-              ),
-        ),
-      ],
-    );
-  }
-
-
-  Widget _buildTab(String label, bool isActive) {
-    return Tab(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFFFD1D1).withOpacity(0.5) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isActive ? Colors.transparent : Colors.grey[200]!),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold),
-        ),
       ),
+      body: _isLoading 
+        ? const Center(child: CircularProgressIndicator())
+        : TabBarView(
+            controller: _tabController,
+            children: [
+              _buildOrderList('ALL'),
+              _buildOrderList('PENDING'),
+              _buildOrderList('SHIPPING'),
+              _buildOrderList('COMPLETED'),
+            ],
+          ),
     );
   }
 
-  Widget _buildOrderList(List<model.Order> orders) {
-    if (orders.isEmpty) {
+  Widget _buildOrderList(String status) {
+    final filteredOrders = status == 'ALL' 
+        ? _orders 
+        : _orders.where((o) => o.status == status).toList();
+
+    if (filteredOrders.isEmpty) {
       return Center(
-        child: Text(
-          'Chưa có đơn hàng nào',
-          style: GoogleFonts.outfit(color: Colors.grey),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.withOpacity(0.5)),
+            const SizedBox(height: 16),
+            Text(
+              'Chưa có đơn hàng nào',
+              style: GoogleFonts.outfit(color: Colors.grey, fontSize: 16),
+            ),
+          ],
         ),
       );
     }
-    final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
-    final dateFormat = DateFormat('dd/MM/yyyy');
 
-    return ListView.separated(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 120),
-
-      itemCount: orders.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 20),
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: filteredOrders.length,
       itemBuilder: (context, index) {
-        final order = orders[index];
-        final firstProduct = order.items.isNotEmpty ? order.items[0].product : null;
-        
-        return _buildOrderCard(
-          id: '#${order.id.substring(0, 8).toUpperCase()}',
-          date: order.createdAt != null ? dateFormat.format(order.createdAt!) : 'N/A',
-          status: _getStatusText(order.status),
-          statusColor: _getStatusColor(order.status),
-          productName: firstProduct?.name ?? 'Sản phẩm',
-          productTags: ['Chiết', 'Chính hãng'],
-          price: formatCurrency.format(order.totalAmount),
-          imageUrl: firstProduct?.imageUrl ?? 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=200&q=80',
-          action1: 'Chi tiết',
-          action2: order.status == 'COMPLETED' ? 'Mua lại' : 'Liên hệ hỗ trợ',
-          isCanceled: order.status == 'CANCELLED',
+        final order = filteredOrders[index];
+        return _OrderCard(
+          order: order,
+          onTap: () {
+            Navigator.pushNamed(
+              context, 
+              '/order_detail', 
+              arguments: order.id
+            ).then((_) => _fetchOrders());
+          },
+          onSupportTap: () => Navigator.pushNamed(context, '/support'),
         );
       },
     );
   }
+}
 
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'PENDING': return 'Chờ xác nhận';
-      case 'SHIPPING': return 'Đang giao';
-      case 'COMPLETED': return 'Hoàn thành';
-      case 'CANCELLED': return 'Đã hủy';
-      default: return status;
+class _OrderCard extends StatelessWidget {
+  final model.Order order;
+  final VoidCallback onTap;
+  final VoidCallback onSupportTap;
+
+  const _OrderCard({
+    required this.order,
+    required this.onTap,
+    required this.onSupportTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const Color primaryColor = Color(0xFF7A5E62);
+    final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+
+    String actionText = 'Xem chi tiết';
+    String? action2;
+    if (order.status == 'PENDING') {
+      action2 = 'Hỗ trợ';
+    } else if (order.status == 'COMPLETED') {
+      action2 = 'Đánh giá';
+    } else {
+      action2 = 'Hỗ trợ';
     }
-  }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'CANCELLED': return const Color(0xFFFFCDD2);
-      default: return const Color(0xFFC8E6C9);
-    }
-  }
-
-  Widget _buildOrderCard({
-    required String id,
-    required String date,
-    required String status,
-    required Color statusColor,
-    required String productName,
-    required List<String> productTags,
-    required String price,
-    required String imageUrl,
-    required String action1,
-    String? action2,
-    bool isCanceled = false,
-  }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
@@ -209,116 +176,113 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD1D1).withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  id,
-                  style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: primaryTextColor),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    if (isCanceled) const Icon(Icons.cancel_outlined, size: 12, color: Colors.red),
-                    if (!isCanceled) const Icon(Icons.local_shipping_outlined, size: 12, color: Colors.green),
-                    const SizedBox(width: 4),
-                    Text(
-                      status,
-                      style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: isCanceled ? Colors.red : Colors.green),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mã đơn hàng',
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                  ),
+                  Text(
+                    '#' + order.id.substring(0, 8).toUpperCase(),
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: primaryColor,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              OrderStatusBadge(status: order.status),
             ],
           ),
-          const SizedBox(height: 10),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Ngày đặt: $date',
-              style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey),
-            ),
-          ),
-          const SizedBox(height: 15),
+          const Divider(height: 24),
           Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: Image.network(imageUrl, height: 80, width: 80, fit: BoxFit.cover),
+                borderRadius: BorderRadius.circular(15),
+                child: Image.network(
+                  order.items.isNotEmpty ? (order.items.first.product.imageUrl ?? '') : '',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (c, e, s) => Container(
+                    width: 60,
+                    height: 60,
+                    color: Colors.grey.shade100,
+                    child: const Icon(Icons.inventory_2_outlined, color: Colors.grey),
+                  ),
+                ),
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      productName,
-                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: primaryTextColor),
+                      order.items.isNotEmpty ? order.items.first.product.name : 'Đơn hàng trống',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: primaryColor),
                     ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: productTags.map((t) => Container(
-                        margin: const EdgeInsets.only(right: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3F4F9),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(t, style: GoogleFonts.outfit(fontSize: 10, color: Colors.grey[600])),
-                      )).toList(),
-                    ),
-                    const SizedBox(height: 10),
                     Text(
-                      price,
-                      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: primaryTextColor),
+                      order.items.length.toString() + ' sản phẩm',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      formatCurrency.format(order.totalAmount),
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                        fontSize: 16,
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: onTap,
                   style: OutlinedButton.styleFrom(
+                    foregroundColor: primaryColor,
+                    side: const BorderSide(color: Color(0xFFE5E5E5)),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    side: BorderSide(color: Colors.grey[300]!),
                   ),
-                  child: Text(action1, style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: primaryTextColor)),
+                  child: Text(
+                    actionText,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-              if (action2 != null) ...[
-                const SizedBox(width: 15),
+              const SizedBox(width: 15),
+              if (action2 != null)
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: onSupportTap,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8D6E63),
-                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFF8B6B61),
                       padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     ),
-                    child: Text(action2, style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      action2,
+                      style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ],
             ],
           ),
         ],

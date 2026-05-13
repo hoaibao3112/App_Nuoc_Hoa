@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
+import '../../utils/constants.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,6 +15,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _authService = AuthService();
   User? currentUser;
   bool isLoading = true;
+  int activeOrderCount = 0;
+  int voucherCount = 0;
 
   final Color primaryTextColor = const Color(0xFF5D4037);
   final Color accentPink = const Color(0xFFFDEAEB);
@@ -22,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _fetchProfile();
+    _fetchCounts();
   }
 
   Future<void> _fetchProfile() async {
@@ -31,6 +35,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         currentUser = profile;
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchCounts() async {
+    try {
+      final orderResponse = await ApiClient.dio.get('/orders/summary/count');
+      final voucherResponse = await ApiClient.dio.get('/vouchers/summary/count');
+      if (mounted) {
+        setState(() {
+          activeOrderCount = orderResponse.data['count'] ?? 0;
+          voucherCount = voucherResponse.data['count'] ?? 0;
+        });
+      }
+    } catch (e) {
+      print('Fetch counts error: $e');
     }
   }
 
@@ -89,10 +108,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: const Color(0xFF5D4037).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text('Hạng Bạc', style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: primaryTextColor)),
+                            child: Text('Hạng ${currentUser?.rank ?? 'Bạc'}', style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: primaryTextColor)),
                           ),
                           const SizedBox(width: 10),
-                          Text('• 1,250 điểm', style: GoogleFonts.outfit(fontSize: 12, color: primaryTextColor.withOpacity(0.7))),
+                          Text('• ${currentUser?.points ?? 0} điểm', style: GoogleFonts.outfit(fontSize: 12, color: primaryTextColor.withOpacity(0.7))),
                         ],
                       ),
                     ],
@@ -105,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildActionCard(
               icon: Icons.shopping_bag_outlined,
               title: 'Đơn hàng của tôi',
-              subtitle: '1 đơn hàng đang giao',
+              subtitle: activeOrderCount > 0 ? '$activeOrderCount đơn hàng đang xử lý' : 'Không có đơn hàng nào',
               onTap: () {},
               iconBgColor: const Color(0xFFFFD1D1).withOpacity(0.3),
             ),
@@ -126,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.pushNamed(context, '/address_book');
                   }),
                   _buildDivider(),
-                  _buildListTile(Icons.confirmation_num_outlined, 'Voucher của tôi', badge: '2 MỚI'),
+                  _buildListTile(Icons.confirmation_num_outlined, 'Voucher của tôi', badge: voucherCount > 0 ? '$voucherCount MỚI' : null),
                   _buildDivider(),
                   _buildListTile(Icons.favorite_border, 'Sản phẩm đã thích'),
                   _buildDivider(),
@@ -143,7 +162,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Column(
                 children: [
-                  _buildListTile(Icons.headset_mic_outlined, 'Hỗ trợ & Liên hệ'),
+                  _buildListTile(Icons.headset_mic_outlined, 'Hỗ trợ & Liên hệ', onTap: () {
+                    Navigator.pushNamed(context, '/support');
+                  }),
+                  _buildDivider(),
+                  _buildListTile(Icons.lock_outline, 'Đổi mật khẩu', onTap: () {
+                    Navigator.pushNamed(context, '/change_password');
+                  }),
                   _buildDivider(),
                   _buildListTile(Icons.settings_outlined, 'Cài đặt'),
                 ],
@@ -209,18 +234,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       leading: Icon(icon, color: primaryTextColor, size: 22),
       title: Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w500, color: primaryTextColor)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (badge != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(color: const Color(0xFFFFD1D1), borderRadius: BorderRadius.circular(10)),
-              child: Text(badge, style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: primaryTextColor)),
-            ),
-          const SizedBox(width: 5),
-          const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
-        ],
+      trailing: SizedBox(
+        width: 80,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (badge != null)
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(color: const Color(0xFFFFD1D1), borderRadius: BorderRadius.circular(10)),
+                  child: Text(
+                    badge,
+                    style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: primaryTextColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            const SizedBox(width: 5),
+            const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+          ],
+        ),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
       onTap: onTap ?? () {},

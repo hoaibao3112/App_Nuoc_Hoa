@@ -5,6 +5,8 @@ class User {
   final String? phone;
   final String? role;
   final String? avatarUrl;
+  final int points;
+  final String rank;
 
   User({
     required this.id,
@@ -13,6 +15,8 @@ class User {
     this.phone,
     this.role,
     this.avatarUrl,
+    this.points = 0,
+    this.rank = 'Bạc',
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,8 @@ class User {
       phone: json['phone'],
       role: json['role'],
       avatarUrl: json['avatarUrl'],
+      points: json['points'] ?? 0,
+      rank: json['rank'] ?? 'Bạc',
     );
   }
 }

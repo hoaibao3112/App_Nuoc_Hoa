@@ -16,6 +16,8 @@ import '../screens/about/about_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/address_book_screen.dart';
 import '../screens/profile/add_address_screen.dart';
+import '../screens/profile/change_password_screen.dart';
+import '../screens/support/support_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -34,6 +36,8 @@ class AppRoutes {
   static const String editProfile = '/edit_profile';
   static const String addressBook = '/address_book';
   static const String addAddress = '/add_address';
+  static const String changePassword = '/change_password';
+  static const String support = '/support';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -53,6 +57,8 @@ class AppRoutes {
       editProfile: (context) => const EditProfileScreen(),
       addressBook: (context) => const AddressBookScreen(),
       addAddress: (context) => const AddAddressScreen(),
+      changePassword: (context) => const ChangePasswordScreen(),
+      support: (context) => const SupportScreen(),
     };
   }
 }

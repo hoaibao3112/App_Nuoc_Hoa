@@ -75,4 +75,14 @@ export class FilterProductDto {
 
   @IsOptional()
   isFeatured?: string; // 'true' | 'false'
-}
+  @IsOptional()
+  brand?: string;
+
+  @IsOptional()
+  minPrice?: number;
+
+  @IsOptional()
+  maxPrice?: number;
+
+  @IsOptional()
+  sort?: 'price_asc' | 'price_desc' | 'newest' | 'popular';}

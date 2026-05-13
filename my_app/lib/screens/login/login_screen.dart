@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../routes/app_routes.dart';
+import '../../services/auth_service.dart';
 import '../../services/google_sign_in_service.dart';
 import '../../utils/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -17,8 +18,46 @@ class _LoginScreenState extends State<LoginScreen> {
   final Color pastelPink = const Color(0xFFFDEAEB);
   final Color accentPink = const Color(0xFFE8C3C8);
   final GoogleSignInService _googleSignInService = GoogleSignInService();
+  final AuthService _authService = AuthService();
   final _storage = const FlutterSecureStorage();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _isGoogleLoading = false;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập đầy đủ email và mật khẩu')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final user = await _authService.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+
+      if (user != null && mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email hoặc mật khẩu không chính xác')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       _buildLabel('Email'),
                       _buildTextField(
+                        controller: _emailController,
                         hint: 'example@gmail.com',
                         icon: Icons.email_outlined,
                       ),
@@ -103,6 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       _buildTextField(
+                        controller: _passwordController,
                         hint: '••••••••',
                         icon: Icons.lock_outline,
                         isPassword: true,
@@ -113,9 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         height: 55,
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, AppRoutes.home);
-                          },
+                          onPressed: _isLoading ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: accentPink,
                             foregroundColor: primaryTextColor,
@@ -124,13 +163,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: Text(
-                            'Đăng nhập',
-                            style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Color(0xFF5D4037))
+                              : Text(
+                                  'Đăng nhập',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 25),
@@ -266,20 +307,28 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField({required String hint, required IconData icon, bool isPassword = false}) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFF3F4F9),
         borderRadius: BorderRadius.circular(15),
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         style: GoogleFonts.outfit(fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.outfit(color: Colors.grey[400]),
           prefixIcon: Icon(icon, color: primaryTextColor.withOpacity(0.5), size: 20),
-          suffixIcon: isPassword ? Icon(Icons.visibility_outlined, color: Colors.grey[400], size: 20) : null,
+          suffixIcon: isPassword
+              ? Icon(Icons.visibility_outlined, color: Colors.grey[400], size: 20)
+              : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),

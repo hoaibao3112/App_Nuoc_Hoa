@@ -98,6 +98,25 @@ class AuthService {
     }
     return null;
   }
+
+  Future<Map<String, dynamic>> changePassword(String oldPassword, String newPassword) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/change-password',
+        data: {
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true, 'message': response.data['message'] ?? 'Đổi mật khẩu thành công'};
+      }
+      return {'success': false, 'message': 'Không thể đổi mật khẩu'};
+    } catch (e) {
+      print('Change password error: $e');
+      return {'success': false, 'message': 'Mật khẩu cũ không chính xác hoặc lỗi hệ thống'};
+    }
+  }
 }
 
 

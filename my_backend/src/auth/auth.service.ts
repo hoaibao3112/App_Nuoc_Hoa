@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { ChangePasswordDto, RegisterDto, LoginDto } from './dto/auth.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -123,5 +123,21 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) throw new BadRequestException('User không tồn tại');
+
+    const isMatch = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    if (!isMatch) {
+      throw new UnauthorizedException('Mật khẩu hiện tại không đúng');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(dto.newPassword, salt);
+
+    await this.usersService.updateProfile(userId, { passwordHash });
+    return { success: true, message: 'Đổi mật khẩu thành công' };
   }
 }

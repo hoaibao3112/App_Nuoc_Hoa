@@ -27,4 +27,11 @@ export class OrdersController {
   cancel(@CurrentUser() user: any, @Param('id') id: string) {
     return this.ordersService.cancelOrder(user.sub, id);
   }
+
+  @Get('summary/count')
+  async getCount(@CurrentUser() user: any) {
+    const orders = await this.ordersService.findOrdersByUser(user.sub);
+    const activeOrders = orders.filter(o => o.status !== 'CANCELLED' && o.status !== 'DELIVERED');
+    return { count: activeOrders.length };
+  }
 }

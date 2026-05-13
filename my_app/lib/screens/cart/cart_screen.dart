@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 import '../../services/cart_service.dart';
+import '../../services/order_service.dart';
 import '../../models/cart.dart';
 import 'package:intl/intl.dart';
 
@@ -13,6 +14,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final CartService _cartService = CartService();
+  final OrderService _orderService = OrderService();
   List<CartItem> _cartItems = [];
   bool _isLoading = true;
   String _selectedPaymentMethod = 'momo'; // momo, bank, cod
@@ -39,6 +41,61 @@ class _CartScreenState extends State<CartScreen> {
 
   double get _totalPrice {
     return _cartItems.fold(0, (sum, item) => sum + (item.product.price * item.quantity));
+  }
+
+  Future<void> _handleCheckout() async {
+    if (_cartItems.isEmpty) return;
+
+    setState(() => _isLoading = true);
+
+    final order = await _orderService.createOrder();
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+
+      if (order != null) {
+        // Clear cart locally or reload
+        _loadCart();
+
+        // Show Success Dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 64),
+                const SizedBox(height: 16),
+                const Text('Đặt hàng thành công!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text('Mã đơn hàng: ${order.id.split("-")[0].toUpperCase()}', style: const TextStyle(color: Colors.grey)),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close dialog
+                      // You might want to navigate to Order History here
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6B4C52),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text('Tiếp tục mua sắm', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại!'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override
@@ -213,16 +270,14 @@ class _CartScreenState extends State<CartScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Add checkout logic here
-                          },
+                          onPressed: _isLoading ? null : _handleCheckout,
                           icon: const Text(''), // Spacer
-                          label: const Row(
+                          label: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Đặt hàng ngay', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                              SizedBox(width: 8),
-                              Icon(Icons.check_circle_outline, size: 20),
+                              Text(_isLoading ? 'Đang xử lý...' : 'Đặt hàng ngay', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              const SizedBox(width: 8),
+                              if (!_isLoading) const Icon(Icons.check_circle_outline, size: 20),
                             ],
                           ),
                           style: ElevatedButton.styleFrom(

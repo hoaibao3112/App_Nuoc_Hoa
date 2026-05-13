@@ -35,6 +35,12 @@ export class User {
   @Column({ nullable: true, unique: true })
   googleId?: string; // Google OAuth2 user ID (sub)
 
+  @Column({ default: 0 })
+  points: number;
+
+  @Column({ default: 'Bạc' })
+  rank: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

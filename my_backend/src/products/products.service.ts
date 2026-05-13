@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto, UpdateProductDto, FilterProductDto } from './dto/product.dto';
 import { Category } from '../categories/entities/category.entity';
@@ -27,14 +27,45 @@ export class ProductsService {
     if (filter.isFeatured !== undefined) {
       where.isFeatured = filter.isFeatured === 'true';
     }
+    if (filter.brand) {
+      where.brand = Like(`%${filter.brand}%`);
+    }
 
+    if (filter.minPrice && filter.maxPrice) {
+      where.price = Between(filter.minPrice, filter.maxPrice);
+    } else if (filter.minPrice) {
+      where.price = MoreThanOrEqual(filter.minPrice);
+    } else if (filter.maxPrice) {
+      where.price = LessThanOrEqual(filter.maxPrice);
+    }
+
+    const order: any = {};
+    if (filter.sort) {
+      switch (filter.sort) {
+        case 'price_asc':
+          order.price = 'ASC';
+          break;
+        case 'price_desc':
+          order.price = 'DESC';
+          break;
+        case 'popular':
+          order.soldQuantity = 'DESC';
+          break;
+        case 'newest':
+        default:
+          order.createdAt = 'DESC';
+          break;
+      }
+    } else {
+      order.createdAt = 'DESC';
+    }
 
     const [items, total] = await this.productsRepository.findAndCount({
       where,
       relations: ['category'],
       skip,
       take: limit,
-      order: { createdAt: 'DESC' },
+      order,
     });
 
     return {
