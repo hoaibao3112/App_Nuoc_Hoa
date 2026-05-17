@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+html, body, #root { height: 100%; }
+body {
+  background-color: #ffffff;
+  color: #111827;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Ensure no horizontal overflow on mobile */
+html, body { overflow-x: hidden; }
+
+/* Touch targets */
+button, a { touch-action: manipulation; }
+
+/* Base typography */
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  color: #0B1220;
+}
+p { color: #374151; }
+
+/* Ensure tap targets */
+button, a { min-height: 44px; }
+
+/* Responsive font scaling */
+:root {
+  --fs-1: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+}
+
+.h1 { font-size: var(--fs-1); }
